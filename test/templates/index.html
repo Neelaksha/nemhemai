@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Web Demo</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        #loading {
+            display: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: blue;
+        }
+        #completed {
+            display: none;
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Demo</h1>
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+        <label for="image">Step 1: Choose image file</label><br>
+        <input type="file" name="image" id="image" accept="image/*" required><br><br>
+        
+        <label for="languages">Step 2: Enter Language Codes (use comma-separated for multiple languages e.g. en,hi):</label><br>
+        <input type="text" name="languages" id="languages" value="en,hi"><br><br>
+
+        <button type="submit">Process</button>
+    </form>
+
+    <!-- Loading message (hidden by default) -->
+    <div id="loading">Processing...</div>
+
+    <!-- Completed message (hidden by default) -->
+    <div id="completed">Completed!</div>
+
+    <h3>Result</h3>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Text</th>
+                <th>Confidence Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Results will be injected here -->
+        </tbody>
+    </table>
+
+    <script>
+        const form = document.getElementById("uploadForm");
+        const resultTableBody = document.getElementById("resultTable").getElementsByTagName("tbody")[0];
+        const loadingElement = document.getElementById("loading");
+        const completedElement = document.getElementById("completed");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();  // Prevent the form from reloading the page
+
+            // Show the loading message
+            loadingElement.style.display = 'block';
+            completedElement.style.display = 'none'; // Hide completed message
+
+            const formData = new FormData(form);
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            // Clear previous results
+            resultTableBody.innerHTML = '';
+
+            // Populate the table with the new results
+            data.forEach((item, index) => {
+                const row = resultTableBody.insertRow();
+                row.insertCell(0).textContent = item.no;
+                row.insertCell(1).textContent = item.text;
+                row.insertCell(2).textContent = item.confidence_score;
+            });
+
+            // Hide loading and show completed message
+            loadingElement.style.display = 'none';
+            completedElement.style.display = 'block';
+        });
+    </script>
+</body>
+</html>

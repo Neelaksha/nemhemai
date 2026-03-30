@@ -1,0 +1,28 @@
+# Prefect configuration for Nemhem application
+# This file configures Prefect for background task processing and scheduled jobs
+
+# Prefect Cloud/Server configuration
+# For local development, Prefect will use SQLite by default
+
+# Default settings
+ Prefect.toml
+[settings]
+PREFECT_API_URL = "http://127.0.0.1:4200/api"
+PREFECT_API_KEY = ""  # Set this for Prefect Cloud
+PREFECT_HOME = ".prefect"
+PREFECT_LOGGING_LEVEL = "INFO"
+
+# Task settings
+[settings.tasks]
+default_retries = 0
+default_retry_delay_seconds = 10
+
+# Flow settings
+[settings.flows]
+default_retries = 0
+default_retry_delay_seconds = 60
+
+# Deployment settings
+[deployments]
+schedule = null
+

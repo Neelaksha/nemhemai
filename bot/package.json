@@ -1,0 +1,20 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "description": "Organized Discord & Telegram bots for app control.",
+  "main": "whatsapp_bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc.9",
+    "axios": "^1.13.6",
+    "baileys": "^7.0.0-rc.9",
+    "dotenv": "^17.3.1",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
