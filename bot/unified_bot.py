@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 DISCORD_SCRIPT = 'discord_bot_enhanced.py'
 TELEGRAM_SCRIPT = 'telegram_bot_enhanced.py'
 SLACK_SCRIPT = 'slack.py'
+TEAMS_SCRIPT = 'teams_bot_enhanced.py'
 
 def check_env(name):
     value = os.getenv(name)
@@ -70,6 +71,7 @@ async def main():
     discord_ok = check_env('DISCORD_TOKEN')
     telegram_ok = check_env('TELEGRAM_TOKEN')
     slack_ok = check_env('SLACK_BOT_TOKEN') and check_env('SLACK_APP_TOKEN')
+    teams_ok = check_env('MICROSOFT_APP_ID') and check_env('MICROSOFT_APP_PASSWORD')
 
     tasks = []
     
@@ -83,6 +85,10 @@ async def main():
         cert_bundle = subprocess.check_output(['python', '-m', 'certifi']).decode().strip()
         slack_env = {'REQUESTS_CA_BUNDLE': cert_bundle, 'SSL_CERT_FILE': cert_bundle}
         tasks.append(run_bot(SLACK_SCRIPT, slack_env))
+    
+    if teams_ok:
+        tasks.append(run_bot(TEAMS_SCRIPT))
+    
     
     if not tasks:
         logger.error('❌ No bots enabled - set tokens!')

@@ -109,6 +109,36 @@ pip install -r requirements.txt  # Slack deps in slack/ may need separate
 - Discord: Invite bot → /chat "hi"
 - Telegram: Message /start → photo OCR
 - Slack: Mention @bot or /ocr img_url
+- **Teams**: Add to channel → `/chat hi` or `/ocr <img_url>` → Backend reply
+
+## Microsoft Teams Bot ✅ **NEW!**
+**`teams_bot_enhanced.py`** - Microsoft Bot Framework (port 3978)
+
+**Features:**
+```
+✅ /chat <prompt> → AI chat (any message)
+✅ /ocr <image_url> → Multilingual OCR  
+✅ /health → Backend status
+✅ /models → List LLMs
+✅ /stop → Shutdown
+```
+
+**Azure Setup (5min):**
+1. [Azure Portal](https://portal.azure.com) → Create "Bot Channels Registration"
+2. Copy **App ID** & **Password** → `.env`
+3. **Messaging endpoint**: `https://ngrok.io:3978/api/messages` (use ngrok for local)
+4. Add bot to Teams channel/app
+
+**Test it:**
+```bash
+cd bot  
+cp .env.example .env  # Add MICROSOFT_APP_ID/PASSWORD
+pip install -r requirements.txt
+./run_teams.sh  # Bot listens on localhost:3978
+# ngrok http 3978 → paste https URL to Azure
+```
+
+**Unified includes Teams!** `./run_unified.sh` (auto if tokens set)
 ```
 
 

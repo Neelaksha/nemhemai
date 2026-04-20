@@ -10,6 +10,9 @@
 
 
 ## Testing:
-- [ ] ./run_unified.sh → all 3 bots online
-- [ ] Test each: Discord /chat, Telegram photo OCR, Slack @mention
+- [ ] ./run_unified.sh → all 4 bots online (Discord/Telegram/Slack/Teams)
+- [ ] Test each: Discord /chat, Telegram photo OCR, Slack @mention, Teams /chat
+
+## Teams Bot ✅ ADDED
+- [ ] User test after Azure/ngrok setup
 
