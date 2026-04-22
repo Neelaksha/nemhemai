@@ -26,6 +26,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
+import { ReportDashboard } from '@/components/ReportDashboard';
 
 // Dual Chain Model Selector Component
 interface DualChainModelSelectorProps {
@@ -1565,51 +1566,66 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
                       
                       {/* Enhanced Markdown Message Content */}
                       <div className={`prose max-w-none ${message.isError ? 'text-red-100' : (!message.isUser ? 'text-black' : 'text-slate-100')}`}>
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          rehypePlugins={[rehypeHighlight]}
-                          components={{
-                            img: ({node, ...props}: any) => {
-                              const src = props.src?.startsWith('http') 
-                                ? props.src 
-                                : `${API_BASE_URL}${props.src}`;
-                              
-                              return <img {...props} src={src} alt={props.alt} style={{maxWidth: '100%', height: 'auto', borderRadius: '8px'}} />;
-                            },
-                            code({node, inline, className, children, ...props}: any) {
-                              return !inline ? (
-                                <div className="relative group my-2">
-                                  <pre className={`rounded-lg ${message.isError ? 'bg-red-900/80 border border-red-700/60' : 'bg-slate-900/80 border border-slate-700/60'} p-4 overflow-x-auto text-sm font-mono ${className || ''}`}
-                                    {...props}
-                                  >
-                                    <code>{children}</code>
-                                  </pre>
-                                  <CopyButton
-                                    text={String(children)}
-                                  />
-                                </div>
-                              ) : (
-                                <code className={`${message.isError ? 'bg-red-800/70 text-red-200' : 'bg-slate-800/70 text-emerald-300'} px-1.5 py-0.5 rounded font-mono text-sm ${className || ''}`}>{children}</code>
-                              );
-                            },
-                            a({node, ...props}: any) {
-                              return (
-                                <a 
-                                  {...props} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className={
-                                    (message.model === 'YouTube' || message.model === 'Reddit' || message.model === 'Academic' || message.model === 'Crypto') 
-                                    ? 'text-blue-400 underline hover:text-blue-300 transition-colors cursor-pointer' 
-                                    : 'text-blue-600 hover:text-blue-800 underline transition-colors cursor-pointer'
-                                  } 
-                                />
-                              );
+                        {(() => {
+                          try {
+                            if (!message.isUser && message.content.trim().startsWith('{') && message.content.trim().endsWith('}')) {
+                              const data = JSON.parse(message.content);
+                              if (data.type === 'dashboard_report') {
+                                return <ReportDashboard data={data} />;
+                              }
                             }
-                          }}
-                        >
-                          {message.isUser ? message.content : message.content}
-                        </ReactMarkdown>
+                          } catch (e) {
+                            // Fallback to markdown if parsing fails
+                          }
+                          
+                          return (
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              rehypePlugins={[rehypeHighlight]}
+                              components={{
+                                img: ({node, ...props}: any) => {
+                                  const src = props.src?.startsWith('http') 
+                                    ? props.src 
+                                    : `${API_BASE_URL}${props.src}`;
+                                  
+                                  return <img {...props} src={src} alt={props.alt} style={{maxWidth: '100%', height: 'auto', borderRadius: '8px'}} />;
+                                },
+                                code({node, inline, className, children, ...props}: any) {
+                                  return !inline ? (
+                                    <div className="relative group my-2">
+                                      <pre className={`rounded-lg ${message.isError ? 'bg-red-900/80 border border-red-700/60' : 'bg-slate-900/80 border border-slate-700/60'} p-4 overflow-x-auto text-sm font-mono ${className || ''}`}
+                                        {...props}
+                                      >
+                                        <code>{children}</code>
+                                      </pre>
+                                      <CopyButton
+                                        text={String(children)}
+                                      />
+                                    </div>
+                                  ) : (
+                                    <code className={`${message.isError ? 'bg-red-800/70 text-red-200' : 'bg-slate-800/70 text-emerald-300'} px-1.5 py-0.5 rounded font-mono text-sm ${className || ''}`}>{children}</code>
+                                  );
+                                },
+                                a({node, ...props}: any) {
+                                  return (
+                                    <a 
+                                      {...props} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer" 
+                                      className={
+                                        (message.model === 'YouTube' || message.model === 'Reddit' || message.model === 'Academic' || message.model === 'Crypto') 
+                                        ? 'text-blue-400 underline hover:text-blue-300 transition-colors cursor-pointer' 
+                                        : 'text-blue-600 hover:text-blue-800 underline transition-colors cursor-pointer'
+                                      } 
+                                    />
+                                  );
+                                }
+                              }}
+                            >
+                              {message.isUser ? message.content : message.content}
+                            </ReactMarkdown>
+                          );
+                        })()}
                       </div>
 
                       {/* Chain responses */}

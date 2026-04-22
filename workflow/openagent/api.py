@@ -119,6 +119,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 import json
 import asyncio
@@ -139,6 +140,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ✅ Serve static files (for charts)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ✅ Models endpoint
 @app.get("/v1/models")
