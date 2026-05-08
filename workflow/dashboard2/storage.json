@@ -1,0 +1,30 @@
+[
+  {
+    "query": "SELECT * FROM sales_data;",
+    "chart_type": "line"
+  },
+  {
+    "query": "SELECT * FROM sales_data;",
+    "chart_type": "bar"
+  },
+  {
+    "query": "SELECT month, users FROM sales_data GROUP BY month ORDER BY COUNT(month) DESC",
+    "chart_type": "pie"
+  },
+  {
+    "query": "SELECT month, users FROM sales_data GROUP BY month ORDER BY COUNT(month) DESC",
+    "chart_type": "pie"
+  },
+  {
+    "query": "SELECT month, sales FROM sales_data GROUP BY month ORDER BY sales DESC",
+    "chart_type": "bar"
+  },
+  {
+    "query": "SELECT month, SUM(sales) as total_sales FROM sales_data GROUP BY month",
+    "chart_type": "bar"
+  },
+  {
+    "query": "SELECT month, SUM(sales) as total_sales FROM sales_data GROUP BY month",
+    "chart_type": "bar"
+  }
+]

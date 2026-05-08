@@ -1,0 +1,92 @@
+/* dashboard/dashboard.css */
+
+.dashboard-container {
+  padding: 2rem;
+  background-color: #09090b; /* Zinc 950 */
+  min-height: 100vh;
+  color: #fafafa;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-card {
+  background: rgba(24, 24, 27, 0.6); /* Zinc 900 with alpha */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(63, 63, 70, 0.4); /* Zinc 700 with alpha */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(161, 161, 170, 0.5); /* Zinc 400 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #a1a1aa; /* Zinc 400 */
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.card-trend {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.trend-up { color: #10b981; } /* Emerald 500 */
+.trend-down { color: #ef4444; } /* Red 500 */
+
+.chart-container {
+  height: 300px;
+  width: 100%;
+}
+
+/* Custom Recharts Tooltip */
+.custom-tooltip {
+  background: rgba(9, 9, 11, 0.9);
+  border: 1px solid rgba(63, 63, 70, 0.8);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-label {
+  font-size: 0.75rem;
+  color: #a1a1aa;
+  margin-bottom: 0.25rem;
+}
+
+.tooltip-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+}

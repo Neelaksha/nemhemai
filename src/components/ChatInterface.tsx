@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+ import { useState, useRef, useEffect, useMemo } from 'react';
 import { Send, Bot, User, Link2, Paperclip, Image, FileText, AlertCircle, Settings, Mic, Database, BarChart3, Upload, ScanText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -387,6 +387,24 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
   const [ocrEnhance, setOcrEnhance] = useState(true);
   const ocrInputRef = useRef<HTMLInputElement>(null);
   
+  // Dashboard Viewer states
+  const [dashboardHtml, setDashboardHtml] = useState<string | null>(null);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
+  
+  // Automatically detect the latest dashboard in the chat history
+  useEffect(() => {
+    const lastDashboard = [...messages].reverse().find(msg => 
+      !msg.isUser && msg.content.includes('<!DOCTYPE html>') && msg.content.includes('ApexCharts')
+    );
+    
+    if (lastDashboard) {
+      // Extract the HTML content (similar logic to the button click)
+      const match = /```html\n([\s\S]*?)\n```/.exec(lastDashboard.content);
+      const htmlContent = match ? match[1] : lastDashboard.content;
+      setDashboardHtml(htmlContent);
+    }
+  }, [messages]);
+
   // Load OCR languages when OCR mode is enabled
   useEffect(() => {
     const loadOcrLanguages = async () => {
@@ -1367,6 +1385,21 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
               <ScanText className="h-4 w-4 mr-1" />
               Tools
             </Button>
+
+            {/* Dashboard Viewer Trigger */}
+            <Button
+              onClick={() => setIsDashboardOpen(true)}
+              disabled={!dashboardHtml}
+              variant={dashboardHtml ? "default" : "outline"}
+              className={`flex items-center gap-1 rounded-xl transition-all duration-300 ${
+                dashboardHtml 
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-500 text-white shadow-lg hover:brightness-110' 
+                  : 'text-slate-400 border-slate-600 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <BarChart3 className="h-4 w-4 mr-1" />
+              View Dashboard
+            </Button>
             
             {/* Model Name Badge */}
             <Badge variant="outline" className="text-slate-400 border-slate-600 bg-slate-800/50">
@@ -1591,6 +1624,11 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
                                   return <img {...props} src={src} alt={props.alt} style={{maxWidth: '100%', height: 'auto', borderRadius: '8px'}} />;
                                 },
                                 code({node, inline, className, children, ...props}: any) {
+                                  const match = /language-(\w+)/.exec(className || '');
+                                  const language = match ? match[1] : '';
+                                  const codeString = String(children).replace(/\n$/, '');
+                                  const isHtmlDashboard = language === 'html' && (codeString.includes('ApexCharts') || codeString.includes('<!DOCTYPE html>'));
+
                                   return !inline ? (
                                     <div className="relative group my-2">
                                       <pre className={`rounded-lg ${message.isError ? 'bg-red-900/80 border border-red-700/60' : 'bg-slate-900/80 border border-slate-700/60'} p-4 overflow-x-auto text-sm font-mono ${className || ''}`}
@@ -1598,9 +1636,23 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
                                       >
                                         <code>{children}</code>
                                       </pre>
-                                      <CopyButton
-                                        text={String(children)}
-                                      />
+                                      <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {isHtmlDashboard && (
+                                          <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            className="bg-emerald-600 hover:bg-emerald-500 text-white h-8 px-3 rounded-md shadow-lg flex items-center gap-2"
+                                            onClick={() => {
+                                              setDashboardHtml(codeString);
+                                              setIsDashboardOpen(true);
+                                            }}
+                                          >
+                                            <BarChart3 className="h-4 w-4" />
+                                            View Dashboard
+                                          </Button>
+                                        )}
+                                        <CopyButton text={codeString} />
+                                      </div>
                                     </div>
                                   ) : (
                                     <code className={`${message.isError ? 'bg-red-800/70 text-red-200' : 'bg-slate-800/70 text-emerald-300'} px-1.5 py-0.5 rounded font-mono text-sm ${className || ''}`}>{children}</code>
@@ -2063,7 +2115,21 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
               </div>
             </div>
             
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex items-center gap-2">
+              <Button
+                type="button"
+                onClick={() => setIsDashboardOpen(true)}
+                disabled={!dashboardHtml}
+                className={`flex items-center gap-2 font-medium py-2 px-4 rounded-2xl shadow-lg transition-all duration-200 ${
+                  dashboardHtml 
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20' 
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span>Dashboard</span>
+              </Button>
+
               <Button 
                 onClick={handleSend} 
                 disabled={isLoading || (!input.trim() && uploadedFiles.length === 0) || (dataAnalysisMode && !csvInfo.has_csv)}
@@ -2112,6 +2178,37 @@ export const ChatInterface = ({ chatId, onLogout }: ChatInterfaceProps) => {
             accept=".png,.jpg,.jpeg,.bmp,.tiff,.gif,.webp"
           />
       </div>
+      {/* Dashboard Viewer Dialog */}
+      <Dialog open={isDashboardOpen} onOpenChange={setIsDashboardOpen}>
+        <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] p-0 overflow-hidden bg-slate-900 border-slate-700">
+          <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b border-slate-700 bg-slate-800">
+              <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+                <BarChart3 className="h-6 w-6 text-emerald-400" />
+                Interactive Dashboard Viewer
+              </DialogTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsDashboardOpen(false)}
+                className="text-slate-400 hover:text-white"
+              >
+                Close
+              </Button>
+            </div>
+            <div className="flex-1 w-full bg-white overflow-auto">
+              {dashboardHtml && (
+                <iframe
+                  srcDoc={dashboardHtml}
+                  className="w-full h-full border-none"
+                  title="Interactive Dashboard"
+                  sandbox="allow-scripts allow-popups allow-forms"
+                />
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
